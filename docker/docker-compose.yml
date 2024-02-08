@@ -11,6 +11,31 @@ services:
     links:
       - php-fpm
   php-fpm:
-    image: php:8-fpm
+#    image: php:8-fpm
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
     volumes:
       - ./../src:/var/www/html
+  db_mysql:
+    container_name: db_mysql
+    image: mysql
+    ports:
+      - "3311:3306"
+    restart: always
+    environment:
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: superPass1!
+      MYSQL_ROOT_PASSWORD: rootSuperPass1!
+    volumes:
+      - /var/lib/mysqld:/var/lib/mysql
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8091:80"
+    environment:
+      - PMA_HOST=db_mysql
+    depends_on:
+      - db_mysql
