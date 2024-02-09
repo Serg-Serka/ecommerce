@@ -92,7 +92,27 @@ const renderProducts = (products) => {
                         <div class="card-body">
                             <h5 class="card-title">${product.name}</h5>
                             <p class="card-text">The price: ${product.price}<br/> The date: ${product.created_at}</p>
-                            <a href="" class="btn btn-primary">More details</a>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal-${product.id}">Buy</button>
+                            <div class="modal fade" id="productModal-${product.id}" tabindex="-1" aria-labelledby="productModalLabel-${product.id}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="productModalLabel-${product.id}">${product.name}</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            The price is ${product.price}
+                                            <br/>
+                                            The date of creation is ${product.created_at}
+                                            <br/>
+                                            Probably, here will be more details :)
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>`
