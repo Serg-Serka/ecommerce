@@ -7,7 +7,7 @@ class Database
     private $dbName;
     private $dbHost;
 
-    private $connection;
+    private PDO $connection;
 
     protected $mysqlError;
 
@@ -51,23 +51,20 @@ class Database
         return self::$instance;
     }
 
-    public function connect(): string
+    public function getConnection(): PDO
     {
-        $success = false;
         if (!isset($this->connection)) {
             try {
                 $connection = new PDO("mysql:host=$this->dbHost;dbName=$this->dbName", $this->dbUser, $this->dbUserPassword);
                 $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $this->connection = $connection;
                 $this->mysqlError = '';
-                $success = true;
             } catch (PDOException $exception) {
                 $this->mysqlError = $exception->getMessage();
-//                $success = false;
             }
         }
 
-        return $success;
+        return $this->connection;
     }
 
     public function getMysqlError()
@@ -77,7 +74,19 @@ class Database
 
     public function getAllCategories()
     {
+        try {
+            $connection = $this->getConnection();
+            $connection->exec("USE ecommerce;");
+            $sql = "SELECT * FROM categories;";
+            $query = $connection->query($sql);
+            foreach ($query as $category) {
+                $result[$category['id']] = $category['name'];
+            }
+        } catch (PDOException $exception) {
+            $result = $exception->getMessage();;
+        }
 
+        return $result;
     }
 
     public function getProductsByCategoryId($categoryId)
