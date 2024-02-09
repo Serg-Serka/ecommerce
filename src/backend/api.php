@@ -1,8 +1,8 @@
 <?php
-require 'Database.php';
-$db = Database::getInstance();
+require "Controller.php";
 
-$categories = $db->getAllCategories();
-
-echo json_encode($categories);
-
+if (isset($_POST['route'])) {
+    $controller = new Controller($_POST['route']);
+    $controller->action();
+    $controller = null;
+}

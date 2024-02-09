@@ -2,14 +2,14 @@
 
 class Database
 {
-    private $dbUser;
-    private $dbUserPassword;
-    private $dbName;
-    private $dbHost;
+    private string $dbUser;
+    private string $dbUserPassword;
+    private string $dbName;
+    private string $dbHost;
 
     private PDO $connection;
 
-    protected $mysqlError;
+    protected string $mysqlError;
 
     private static Database $instance;
 
@@ -72,18 +72,18 @@ class Database
         return $this->mysqlError;
     }
 
-    public function getAllCategories()
+    public function performQuery($sql): array
     {
+        $result = [];
         try {
             $connection = $this->getConnection();
-            $connection->exec("USE ecommerce;");
-            $sql = "SELECT * FROM categories;";
-            $query = $connection->query($sql);
-            foreach ($query as $category) {
-                $result[$category['id']] = $category['name'];
+            $connection->exec("USE $this->dbName;");
+            $query = $connection->query($sql, PDO::FETCH_ASSOC);
+            foreach ($query as $row) {
+                $result[] = $row;
             }
         } catch (PDOException $exception) {
-            $result = $exception->getMessage();;
+            $result = [$exception->getMessage()];
         }
 
         return $result;
