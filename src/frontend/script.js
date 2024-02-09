@@ -18,7 +18,6 @@ const performAjax = (route, successFn, params = []) => {
 
 const getCategories = () => {
     performAjax('categories', (result) => {
-        console.log(result);
         for (const [key, value] of Object.entries(JSON.parse(result))) {
             $("#categories-list").append(
                 `<button type="button"
@@ -33,7 +32,6 @@ const getCategories = () => {
     });
 };
 
-
 const getProducts = (categoryId, listElement) => {
     $('#products-container').empty();
     $("#categories-list").children().get().forEach(element => {
@@ -42,39 +40,64 @@ const getProducts = (categoryId, listElement) => {
     listElement.classList.add("list-group-item-primary");
 
     performAjax('productsByCategory', (result) => {
-        console.log(JSON.parse(result));
         let products = JSON.parse(result);
-        let rowCount = 1;
-        $("#products-container").append(
-            `<br/><div class='row'></div>`
-        );
+        if (products.length) {
+            $("#sorting-select").on('change', (e) => {
+                sortProducts(products, e.target.value);
+            });
 
-        products.forEach(product => {
-            if (rowCount === 4) {
-                $("#products-container").append(
-                    `<br/><div class='row'></div>`
-                );
+            renderProducts(products);
+        }
+    }, [categoryId]);
+};
 
-                rowCount = 0;
-            }
-            $("#products-container .row").last().append(
-                `<div class="col-4">
+const sortProducts = (products, sortParam) => {
+    let sortFn;
+
+    switch (sortParam) {
+        case 'created_at':
+            sortFn = (a, b) => new Date(a?.created_at) - new Date(b?.created_at);
+            break;
+        case 'price':
+            sortFn = (a, b) => a?.price - b?.price;
+            break;
+        case 'name':
+            sortFn = (a, b) => ('' + a?.name).localeCompare(b?.name);
+            break;
+        default:
+            sortFn = (a, b) => a[sortParam] - b[sortParam];
+    }
+
+    products.sort(sortFn);
+    renderProducts(products);
+};
+
+const renderProducts = (products) => {
+    $('#products-container').empty();
+    $("#products-container").append(
+        `<br/><div class='row'></div>`
+    );
+    let rowCount = 1;
+
+    products.forEach(product => {
+        if (rowCount === 4) {
+            $("#products-container").append(
+                `<br/><div class='row'></div>`
+            );
+            rowCount = 0;
+        }
+        $("#products-container .row").last().append(
+            `<div class="col-4">
                     <div class="card" style="width: 18rem;">
                         <div class="card-body">
                             <h5 class="card-title">${product.name}</h5>
                             <p class="card-text">The price: ${product.price}<br/> The date: ${product.created_at}</p>
-                            <a href="#" class="btn btn-primary">More details</a>
+                            <a href="" class="btn btn-primary">More details</a>
                         </div>
                     </div>
                 </div>`
-            );
+        );
 
-            rowCount++;
-            console.log(product?.name);
-        });
-
-
-    }, [categoryId]);
-
-
+        rowCount++;
+    });
 };
