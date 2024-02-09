@@ -3,9 +3,12 @@
 class Product
 {
 
-    public function getProductsByCategory()
+    public function getProductsByCategory($categoryId): array
     {
-        return 123;
+        $db = Database::getInstance();
+
+        $sql = "SELECT * FROM products WHERE category_id = $categoryId";
+        return $db->performQuery($sql);
     }
 
 }
