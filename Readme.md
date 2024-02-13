@@ -16,3 +16,6 @@ So, here are the steps to install and test the project locally:
 6. Go to ``http://localhost:8080/`` and see your categories and products. There are an example bellow, how it should look:
 
 ![img.png](docs/frontend.png)
+
+
+Also, there is a db script for building categories tree in `src/backend/db_script.php`
