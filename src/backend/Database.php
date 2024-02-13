@@ -67,11 +67,6 @@ class Database
         return $this->connection;
     }
 
-    public function getMysqlError()
-    {
-        return $this->mysqlError;
-    }
-
     public function performQuery($sql): array
     {
         $result = [];
@@ -89,15 +84,6 @@ class Database
         return $result;
     }
 
-    public function getProductsByCategoryId($categoryId)
-    {
-
-    }
-
-    public function getProductById($productId)
-    {
-
-    }
 
 
 
