@@ -1,5 +1,25 @@
+let categoryProducts = [];
+
 $(document).ready(function () {
+    $("#sorting-select").on('change', (e) => {
+        sortProducts(e.target.value);
+    });
+
     getCategories();
+
+    const queryString = window.location.search;
+    if (queryString) {
+        const urlParams = new URLSearchParams(queryString);
+        const category = urlParams.get('category');
+        const sortBy = urlParams.get('sortBy');
+        if (category) {
+            getProducts(category);
+        }
+        if (sortBy) {
+            $("#sorting-select").val(sortBy);
+            sortProducts(sortBy);
+        }
+    }
 });
 
 const performAjax = (route, successFn, params = []) => {
@@ -21,8 +41,9 @@ const getCategories = () => {
         for (const [key, value] of Object.entries(JSON.parse(result))) {
             $("#categories-list").append(
                 `<button type="button"
+                         id="category-button-${value?.id}"
                          class="list-group-item list-group-item-action d-flex justify-content-between align-items-start"
-                         onclick="getProducts(${value?.id}, this)"
+                         onclick="getProducts(${value?.id})"
                          >
                         ${value?.name}
                     <span class="badge bg-primary rounded-pill">${value?.product_count}</span>
@@ -32,26 +53,31 @@ const getCategories = () => {
     });
 };
 
-const getProducts = (categoryId, listElement) => {
+const getProducts = (categoryId) => {
+    window.history.replaceState(null, null, `?category=${categoryId}`);
+
     $('#products-container').empty();
     $("#categories-list").children().get().forEach(element => {
         element.classList.remove("list-group-item-primary");
     })
-    listElement.classList.add("list-group-item-primary");
+    // $(`#category-button-${categoryId}`)[0].classList.add("list-group-item-primary");
 
     performAjax('productsByCategory', (result) => {
         let products = JSON.parse(result);
         if (products.length) {
-            $("#sorting-select").on('change', (e) => {
-                sortProducts(products, e.target.value);
-            });
-
             renderProducts(products);
         }
+        categoryProducts = products;
     }, [categoryId]);
 };
 
-const sortProducts = (products, sortParam) => {
+const sortProducts = (sortParam, products = []) => {
+    const queryString = window.location.search;
+    if (queryString) {
+        const urlParams = new URLSearchParams(queryString);
+        const category = urlParams.get('category');
+        window.history.replaceState(null, '', `?category=${category}&sortBy=${sortParam}`);
+    }
     let sortFn;
 
     switch (sortParam) {
@@ -66,6 +92,10 @@ const sortProducts = (products, sortParam) => {
             break;
         default:
             sortFn = (a, b) => a[sortParam] - b[sortParam];
+    }
+
+    if (!products.length) {
+        products = categoryProducts;
     }
 
     products.sort(sortFn);
